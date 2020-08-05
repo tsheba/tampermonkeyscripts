@@ -5,6 +5,7 @@
 //  ... add match eg https://myazerdevops/*
 // @match        https://
 // @updateURL    https://github.com/tsheba/tampermonkeyscripts/raw/master/AzureDevOpsCommentEnhancer.user.js
+// @downloadURL  https://github.com/tsheba/tampermonkeyscripts/raw/master/AzureDevOpsCommentEnhancer.user.js
 // @grant        none
 // ==/UserScript==
 
