@@ -4,7 +4,7 @@
 // @author       Tobias Sachs
 //  ... add match eg https://myazerdevops/*
 // @match        https://
-// @updateURL    https://github.com/tsheba/tampermonkeyscripts/blob/master/AzureDevOpsCommentEnhancer.user.js
+// @updateURL    https://github.com/tsheba/tampermonkeyscripts/raw/master/AzureDevOpsCommentEnhancer.user.js
 // @grant        none
 // ==/UserScript==
 
