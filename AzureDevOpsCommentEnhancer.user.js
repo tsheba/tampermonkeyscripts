@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Fix ADS checkin comments in discussion and history of workitems
-// @version      0.1
+// @version      0.2
 // @author       Tobias Sachs
 //  ... add match eg https://myazerdevops/*
 // @match        https://
