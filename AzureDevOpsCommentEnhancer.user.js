@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Fix ADS checkin comments in discussion and history of workitems
-// @version      0.6
+// @version      0.7
 // @author       Tobias Sachs
 //  ... in @match replace "ads" with the url of you Azure DevOps Server
 // @match        https://ads/*
@@ -10,6 +10,7 @@
 // @description
 // ==/UserScript==
 
+// 0.7: fix work item tampering
 // 0.6: Add link to Changeset in diff view
 
 (function() {
@@ -83,13 +84,11 @@
             {
                 fixVersionControl();
             }
-            else if (url.includes("/_workitems")){
+            else{
+                // if (url.includes("/_workitems")){
+                // does not work since workitem are often shown in 
+                // diaolgs on random pages
                 fixWorkitems();
-            }
-            else
-            {
-                console.info("nothing to do here");
-                return;
             }
 
             // keep watching for changes.
