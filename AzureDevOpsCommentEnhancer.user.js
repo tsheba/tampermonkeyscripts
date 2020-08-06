@@ -1,16 +1,32 @@
 // ==UserScript==
 // @name         Fix ADS checkin comments in discussion and history of workitems
-// @version      0.1
+// @version      0.6
 // @author       Tobias Sachs
-//  ... add match eg https://myazerdevops/*
-// @match        https://
+//  ... in @match replace "ads" with the url of you Azure DevOps Server
+// @match        https://ads/*
+// @updateURL    https://github.com/tsheba/tampermonkeyscripts/raw/master/AzureDevOpsCommentEnhancer.user.js
+// @downloadURL  https://github.com/tsheba/tampermonkeyscripts/raw/master/AzureDevOpsCommentEnhancer.user.js
 // @grant        none
+// @description
 // ==/UserScript==
+
+// 0.6: Add link to Changeset in diff view
 
 (function() {
     'use strict';
     let timerId = undefined;
-    let fixComments = (items) =>
+
+    let fixWorkitems = () =>
+    {
+        let found = document.getElementsByClassName("comment-content");
+        fixCommentContents(found);
+
+        found = document.getElementsByClassName("history-item-comment");
+        fixCommentContents(found);
+
+        console.debug("observe...");
+    }
+    let fixCommentContents = (items) =>
     {
         if (items === null || items === undefined || items.length === 0)
         {
@@ -27,6 +43,29 @@
             }
         }
     };
+
+    let fixVersionControl = () =>
+    {
+        let elToFix;
+        let found = document.getElementsByClassName("changeset-version")[0];
+        if (found) {
+            // if opened from email notification it is the first span in div "changeset-version"
+            elToFix = found.querySelector("span");
+        }
+        else
+        {
+            // if opened from histrory in ads it is the span in div "changeset-id"
+            // elToFix = document.getElementsByClassName("changeset-id")[0];
+        }
+        if (!elToFix)
+        {
+            return;
+        }
+
+        elToFix.innerHTML = elToFix.innerHTML.replace(/(Changeset )(\d+)/, "$1<a href='/HeBa/Entwicklung/_versionControl/changeset/$2'>$2</a>");
+
+    }
+
     let fixit = () => {
         if (timerId){
             console.debug("fixit timerreset...");
@@ -34,15 +73,26 @@
         }
 
         observer.disconnect();
+
         timerId = setTimeout(function(){
             timerId = undefined;
-            let found = document.getElementsByClassName("comment-content");
-            fixComments(found);
 
-            found = document.getElementsByClassName("history-item-comment");
-            fixComments(found);
+            let url = window.location.href;
 
-            console.debug("observe...");
+            if (url.includes("/_versionControl"))
+            {
+                fixVersionControl();
+            }
+            else if (url.includes("/_workitems")){
+                fixWorkitems();
+            }
+            else
+            {
+                console.info("nothing to do here");
+                return;
+            }
+
+            // keep watching for changes.
             observer.observe(document, { subtree: true, childList: true, characterData: true });
         }, 300);
     };
