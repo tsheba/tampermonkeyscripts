@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Fix ADS checkin comments in discussion and history of workitems
-// @version      0.7
+// @version      0.8
 // @author       Tobias Sachs
 //  ... in @match replace "ads" with the url of you Azure DevOps Server
 // @match        https://ads/*
@@ -10,6 +10,7 @@
 // @description
 // ==/UserScript==
 
+// 0.8: fix typos/formatting
 // 0.7: fix work item tampering
 // 0.6: Add link to Changeset in diff view
 
@@ -17,8 +18,7 @@
     'use strict';
     let timerId = undefined;
 
-    let fixWorkitems = () =>
-    {
+    let fixWorkitems = () => {
         let found = document.getElementsByClassName("comment-content");
         fixCommentContents(found);
 
@@ -26,78 +26,70 @@
         fixCommentContents(found);
 
         console.debug("observe...");
-    }
-    let fixCommentContents = (items) =>
-    {
-        if (items === null || items === undefined || items.length === 0)
-        {
+    };
+    
+    let fixCommentContents = (items) => {
+        if (items === null || items === undefined || items.length === 0) {
             return;
         }
         console.info("fixing '" + items.length +"' comments.");
-        for (var i = 0; i < items.length; i++){
+        for (var i = 0; i < items.length; i++) {
             let el = items[i];
             let html = el.innerHTML;
-            if (html.startsWith("Associated"))
-            {
+            if (html.startsWith("Associated")) {
                 html = html.replace(/(Associated with changeset )(\d*):/, "<b>$1<a href='/HeBa/Entwicklung/_versionControl/changeset/$2'>$2</a></b>:<br />");
                 el.innerHTML = html.replace(/\n/gi, "<br />");
             }
         }
     };
 
-    let fixVersionControl = () =>
-    {
+    let fixVersionControl = () => {
         let elToFix;
         let found = document.getElementsByClassName("changeset-version")[0];
-        if (found) {
-            // if opened from email notification it is the first span in div "changeset-version"
-            elToFix = found.querySelector("span");
+        if (!found) {
+            return;
         }
-        else
-        {
-            // if opened from histrory in ads it is the span in div "changeset-id"
-            // elToFix = document.getElementsByClassName("changeset-id")[0];
-        }
-        if (!elToFix)
-        {
+        
+        // if opened from email notification, it is the first span in div "changeset-version"
+        elToFix = found.querySelector("span");
+    
+        if (!elToFix) {
             return;
         }
 
         elToFix.innerHTML = elToFix.innerHTML.replace(/(Changeset )(\d+)/, "$1<a href='/HeBa/Entwicklung/_versionControl/changeset/$2'>$2</a>");
-
     }
 
     let fixit = () => {
-        if (timerId){
+        if (timerId) {
             console.debug("fixit timerreset...");
             clearTimeout(timerId);
         }
 
         observer.disconnect();
 
-        timerId = setTimeout(function(){
+        timerId = setTimeout(function() {
             timerId = undefined;
 
             let url = window.location.href;
 
-            if (url.includes("/_versionControl"))
-            {
+            if (url.includes("/_versionControl")) {
                 fixVersionControl();
             }
-            else{
+            else {
                 // if (url.includes("/_workitems")){
-                // does not work since workitem are often shown in 
-                // diaolgs on random pages
+                // does not work since workitems are often shown in 
+                // dialogs on random pages
                 fixWorkitems();
             }
 
-            // keep watching for changes.
+            // keep watching for changes
             observer.observe(document, { subtree: true, childList: true, characterData: true });
         }, 300);
     };
 
     const observer = new MutationObserver(function() {
-        console.debug('observertriggered...');
+        console.debug('observer was triggered...');
         fixit();
     });
 
